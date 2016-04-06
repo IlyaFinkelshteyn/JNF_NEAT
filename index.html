@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Jnf neat : Actually usable implementation of NEAT">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Jnf neat</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/SirRade/JNF_NEAT">View on GitHub</a>
+
+          <h1 id="project_title">Jnf neat</h1>
+          <h2 id="project_tagline">Actually usable implementation of NEAT</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/SirRade/JNF_NEAT/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/SirRade/JNF_NEAT/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="jnf_neat" class="anchor" href="#jnf_neat" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>JNF_NEAT</h1>
+
+<p>My Implementation of Kenneth Stanley and Risto Miikkulainen's NEAT (NeuroEvolution
+of Augmenting Topologies, <a href="http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf">http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf</a>).</p>
+
+<p>It focuses (in contrast to other implementations) on</p>
+
+<ul>
+<li>Speed - through modern and efficient C++14</li>
+<li>Clean Code - through constant ongoing refactoring and a deep care for aesthetics</li>
+<li>Usability - through beeing able to be used without much knowledge of Neural Networks</li>
+</ul>
+
+<h2>
+<a id="foreword" class="anchor" href="#foreword" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Foreword</h2>
+
+<p>TODO</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>First, you have to instanciate a <code>NeuralNetworkTrainer</code>. This class will take care of everything. It uses standard training values if not provided with a parameter. If you know what you're doing, you can provide it with a <code>NeuralNetworkTrainer::RuleSet</code> instance to tweak the learning process.   </p>
+
+<p>You then have to provide an implementation of the <code>ITrainable</code> interface. It's Methods are</p>
+
+<ul>
+<li>Update()</li>
+<li>GetOrCalculateFitness()</li>
+<li>ReceiveNetworkOutputs()</li>
+<li>ProvideNetworkWithInputs()</li>
+</ul>
+
+<h3>
+<a id="update" class="anchor" href="#update" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update()</h3>
+
+<p>This method gets called automatically multiple times during training.</p>
+
+<blockquote>
+<p>default updatesPerGeneration: 1<br>
+Imagine this value as <strong>number of actions per lifetime</strong></p>
+</blockquote>
+
+<p>The actions of your Object should take Place here. This almost always boils down to <strong>executing the command the Neural Network decides to use</strong>. (Remember: You get this Informtion by calling <code>LoadNeuralNetworkOutputs()</code>).</p>
+
+<p><strong>Example</strong>: Say you want to train an artificial player for Super Mario World. This method should then take care of actually pressing the buttons your Network want you to. In this specific case, it should also update the whole game for a frame, so enemies and items can react to Mario.</p>
+
+<h3>
+<a id="getorcalculatefitness" class="anchor" href="#getorcalculatefitness" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GetOrCalculateFitness()</h3>
+
+<p>This method tells the trainer how good this specific instance is compared to others.<br>
+It gets called automatically when the <code>ITrainable</code> object dies </p>
+
+<blockquote>
+<p>It's used to generate it's offspring, with a fitness score of zero or lower meaning that this individuals genes are not going to get passed on</p>
+
+<p>default minFitness: -2147483646<br>
+default maxFitness: 100</p>
+</blockquote>
+
+<p>Note that in very analog programs such as real world simulations, true perfection should be unreachable</p>
+
+<p><strong>Example</strong>: A simulated chess player could have a fitness method implemented like this:</p>
+
+<pre><code>unsigned int ChessSim::GetOrCalculateFitness() {
+  unsigned int fitness = 0;  
+  for (const auto &amp; piece : enemyKilledPieces) {
+    fitness += piece.GetImportance();
+  }
+  for (const auto &amp; piece : ownKilledPieces) {
+    fitness -= piece.GetImportance();
+  }
+  return fitness;
+}
+</code></pre>
+
+<h3>
+<a id="receivenetworkoutputs" class="anchor" href="#receivenetworkoutputs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ReceiveNetworkOutputs()</h3>
+
+<p>This method returns the conclusions of your neural network as a series of floats</p>
+
+<blockquote>
+<p>default minNeuralCharge = 0.0;<br>
+default maxNeuralCharge = 1.0;<br>
+It is <strong>highly</strong> recommended to leave these values like this (see advanced FAQ for details)</p>
+</blockquote>
+
+<p>Almost always you'll of the time you'll want to translate these values into something your Program can work with and store in a member</p>
+
+<p><strong>Example</strong>: TODO</p>
+
+<h3>
+<a id="providenetworkwithinputs" class="anchor" href="#providenetworkwithinputs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ProvideNetworkWithInputs</h3>
+
+<p>TODO</p>
+
+<blockquote>
+<p>default minNeuralCharge = 0.0;<br>
+default maxNeuralCharge = 1.0;<br>
+It is <strong>highly</strong> recommended to leave these values like this (see advanced FAQ for details)</p>
+</blockquote>
+
+<p><strong>Example</strong>: TODO</p>
+
+<h3>
+<a id="full-example" class="anchor" href="#full-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Full Example</h3>
+
+<p>TODO</p>
+
+<h2>
+<a id="faq" class="anchor" href="#faq" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FAQ</h2>
+
+<p>TODO</p>
+
+<h2>
+<a id="advanced-faq" class="anchor" href="#advanced-faq" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Advanced FAQ</h2>
+
+<p>TODO</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Jnf neat maintained by <a href="https://github.com/SirRade">SirRade</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
