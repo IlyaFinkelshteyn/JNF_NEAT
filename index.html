@@ -34,7 +34,7 @@
         <h1>
 <a id="jnf_neat" class="anchor" href="#jnf_neat" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>JNF_NEAT</h1>
 
-<p>My Implementation of Kenneth Stanley and Risto Miikkulainen's NEAT (NeuroEvolution
+<p>My implementation of Kenneth Stanley and Risto Miikkulainen's NEAT (NeuroEvolution
 of Augmenting Topologies, <a href="http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf">http://nn.cs.utexas.edu/downloads/papers/stanley.ec02.pdf</a>).</p>
 
 <p>It focuses (in contrast to other implementations) on</p>
@@ -55,7 +55,7 @@ of Augmenting Topologies, <a href="http://nn.cs.utexas.edu/downloads/papers/stan
 
 <p>First, you have to instanciate a <code>NeuralNetworkTrainer</code>. This class will take care of everything. It uses standard training values if not provided with a parameter. If you know what you're doing, you can provide it with a <code>NeuralNetworkTrainer::RuleSet</code> instance to tweak the learning process.   </p>
 
-<p>You then have to provide an implementation of the <code>ITrainable</code> interface. It's Methods are</p>
+<p>You then have to provide an implementation of the <code>ITrainable</code> interface. It's methods are</p>
 
 <ul>
 <li>Update()</li>
@@ -74,9 +74,10 @@ of Augmenting Topologies, <a href="http://nn.cs.utexas.edu/downloads/papers/stan
 Imagine this value as <strong>number of actions per lifetime</strong></p>
 </blockquote>
 
-<p>The actions of your Object should take Place here. This almost always boils down to <strong>executing the command the Neural Network decides to use</strong>. (Remember: You get this Informtion by calling <code>LoadNeuralNetworkOutputs()</code>).</p>
+<p>The actions of your object should take place here. This almost always boils down to <strong>executing the command the Neural Network decides to use</strong>.<br>
+(Remember: You get this Informtion by calling <code>LoadNeuralNetworkOutputs()</code>).</p>
 
-<p><strong>Example</strong>: Say you want to train an artificial player for Super Mario World. This method should then take care of actually pressing the buttons your Network want you to. In this specific case, it should also update the whole game for a frame, so enemies and items can react to Mario.</p>
+<p><strong>Example</strong>: Let's say you want to train an artificial player for Super Mario World. This method should then take care of actually pressing the buttons your network want you to. In this specific case, it should also update the whole game for a frame, so enemies and items can react to Mario.</p>
 
 <h3>
 <a id="getorcalculatefitness" class="anchor" href="#getorcalculatefitness" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GetOrCalculateFitness()</h3>
@@ -85,7 +86,7 @@ Imagine this value as <strong>number of actions per lifetime</strong></p>
 It gets called automatically when the <code>ITrainable</code> object dies </p>
 
 <blockquote>
-<p>It's used to generate it's offspring, with a fitness score of zero or lower meaning that this individuals genes are not going to get passed on</p>
+<p>It's used to generate its offspring, with a fitness score of zero or lower meaning that the genes of this individualare not going to get passed on</p>
 
 <p>default minFitness: -2147483646<br>
 default maxFitness: 100</p>
@@ -118,12 +119,12 @@ default maxNeuralCharge = 1.0;<br>
 It is <strong>highly</strong> recommended to leave these values like this (see advanced FAQ for details)</p>
 </blockquote>
 
-<p>Almost always you'll of the time you'll want to translate these values into something your Program can work with and store in a member</p>
+<p>You'll want to translate these values almost all the time into something your program can work with and store in a member.</p>
 
 <p><strong>Example</strong>: TODO</p>
 
 <h3>
-<a id="providenetworkwithinputs" class="anchor" href="#providenetworkwithinputs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ProvideNetworkWithInputs</h3>
+<a id="providenetworkwithinputs" class="anchor" href="#providenetworkwithinputs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ProvideNetworkWithInputs()</h3>
 
 <p>TODO</p>
 
