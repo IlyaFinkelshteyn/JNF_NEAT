@@ -48,12 +48,39 @@ of Augmenting Topologies, <a href="http://nn.cs.utexas.edu/downloads/papers/stan
 <h2>
 <a id="foreword" class="anchor" href="#foreword" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Foreword</h2>
 
+<h3>
+<a id="motivation" class="anchor" href="#motivation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Motivation</h3>
+
+<p>One of the problems of machine learning is its steep learning curve. If you want to let your code learn,
+you've got few choices: Use expensive proprietary modules or use libraries that are aimed at people with experience in AI.
+If you want to learn how machine learning works, you've got to read scientific papers with tons of buzzwords.
+The provided code is often made by people who are brilliant at researching, but have only got poor programming skills.</p>
+
+<p>We think this is a shame. A programmer shouldn't have to learn about the internals of a class.
+He should be able to use it intuitively, in a matter that it relieves him from work, not set him up for more.
+That's the age old principle of encapsulation!</p>
+
+<p>Another problem we've encountered, was platform dependency. Despite being conceived as a platform independent language,
+we encountered various implementations of NEAT, that managed to break this. Examples included code with for loops looking like this:</p>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-k">for</span>( i = 0<span class="pl-k">;</span> i <span class="pl-k">&lt;</span> 10<span class="pl-k">;</span> i++ ){
+    ...
+}</pre></div>
+
+<p>Notice the <code>i</code> not having been declared? Some compilers permit this. Another, more subtle one was the <code>abstract</code> keyword
+of Microsoft Visual Studio. It's actually not part of the language. The official way is to write an (admittedly more arbitrary) <code>= 0</code>
+at the end of a function.</p>
+
+<h3>
+<a id="what-is-neat" class="anchor" href="#what-is-neat" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is NEAT?</h3>
+
 <p>TODO</p>
 
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>First, you have to instanciate a <code>NeuralNetworkTrainer</code>. This class will take care of everything. It uses standard training values if not provided with a parameter. If you know what you're doing, you can provide it with a <code>NeuralNetworkTrainer::RuleSet</code> instance to tweak the learning process.   </p>
+<p>First, you have to instantiate a <code>NeuralNetworkTrainer</code>. This class will take care of everything. It uses standard training values if not provided with a parameter.
+If you know what you're doing, you can provide it with a <code>NeuralNetworkTrainer::RuleSet</code> instance to tweak the learning process.</p>
 
 <p>You then have to provide an implementation of the <code>ITrainable</code> interface. It's methods are</p>
 
@@ -70,25 +97,24 @@ of Augmenting Topologies, <a href="http://nn.cs.utexas.edu/downloads/papers/stan
 <p>This method gets called automatically multiple times during training.</p>
 
 <blockquote>
-<p>default updatesPerGeneration: 1<br>
+<p>default updatesPerGeneration: 1
 Imagine this value as <strong>number of actions per lifetime</strong></p>
 </blockquote>
 
-<p>The actions of your object should take place here. This almost always boils down to <strong>executing the command the Neural Network decides to use</strong>.<br>
-(Remember: You get this Informtion by calling <code>LoadNeuralNetworkOutputs()</code>).</p>
+<p>The actions of your object should take place here. This almost always boils down to <strong>executing the command the Neural Network decides to use</strong>. (Remember: You get this Information by calling <code>LoadNeuralNetworkOutputs()</code>).</p>
 
-<p><strong>Example</strong>: Let's say you want to train an artificial player for Super Mario World. This method should then take care of actually pressing the buttons your network want you to. In this specific case, it should also update the whole game for a frame, so enemies and items can react to Mario.</p>
+<p><strong>Example</strong>: Say you want to train an artificial player for Super Mario World. This method should then take care of actually pressing the buttons your network want you to. In this specific case, it should also update the whole game for a frame, so enemies and items can react to Mario.</p>
 
 <h3>
 <a id="getorcalculatefitness" class="anchor" href="#getorcalculatefitness" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GetOrCalculateFitness()</h3>
 
-<p>This method tells the trainer how good this specific instance is compared to others.<br>
-It gets called automatically when the <code>ITrainable</code> object dies </p>
+<p>This method tells the trainer how good this specific instance is compared to others.
+It gets called automatically when the <code>ITrainable</code> object dies</p>
 
 <blockquote>
-<p>It's used to generate its offspring, with a fitness score of zero or lower meaning that the genes of this individualare not going to get passed on</p>
+<p>It's used to generate this objects offspring, with a fitness score of zero or lower meaning that this individuals genes are not going to get passed on</p>
 
-<p>default minFitness: -2147483646<br>
+<p>default minFitness: -2147483646
 default maxFitness: 100</p>
 </blockquote>
 
@@ -96,17 +122,16 @@ default maxFitness: 100</p>
 
 <p><strong>Example</strong>: A simulated chess player could have a fitness method implemented like this:</p>
 
-<pre><code>unsigned int ChessSim::GetOrCalculateFitness() {
-  unsigned int fitness = 0;  
-  for (const auto &amp; piece : enemyKilledPieces) {
-    fitness += piece.GetImportance();
+<div class="highlight highlight-source-shell"><pre>unsigned int <span class="pl-en">ChessSim::GetOrCalculateFitness</span>() {
+  unsigned int fitness = 0<span class="pl-k">;</span>
+  <span class="pl-k">for</span> (const auto <span class="pl-k">&amp;</span> piece <span class="pl-c1">:</span> enemyKilledPieces) {
+    fitness += <span class="pl-en">piece.GetImportance</span>();
   }
-  for (const auto &amp; piece : ownKilledPieces) {
-    fitness -= piece.GetImportance();
+  <span class="pl-k">for</span> (const auto <span class="pl-k">&amp;</span> piece <span class="pl-c1">:</span> ownKilledPieces) {
+    fitness -= <span class="pl-en">piece.GetImportance</span>();
   }
-  return fitness;
-}
-</code></pre>
+  <span class="pl-k">return</span> fitness<span class="pl-k">;</span>
+}</pre></div>
 
 <h3>
 <a id="receivenetworkoutputs" class="anchor" href="#receivenetworkoutputs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ReceiveNetworkOutputs()</h3>
@@ -114,19 +139,21 @@ default maxFitness: 100</p>
 <p>This method returns the conclusions of your neural network as a series of floats</p>
 
 <blockquote>
-<p>default minNeuralCharge = 0.0;<br>
-default maxNeuralCharge = 1.0;<br>
+<p>default minNeuralCharge = 0.0;
+default maxNeuralCharge = 1.0;
 It is <strong>highly</strong> recommended to leave these values like this (see advanced FAQ for details)</p>
 </blockquote>
 
-<p>You'll want to translate these values almost all the time into something your program can work with and store in a member.</p>
+<p>Almost always you'll want to translate these values into something your program can work with and store in a member</p>
 
 <p><strong>Example</strong>: TODO</p>
 
 <h3>
 <a id="providenetworkwithinputs" class="anchor" href="#providenetworkwithinputs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ProvideNetworkWithInputs()</h3>
 
-<p>TODO</p>
+<p>This method describes what your network "sees". It get's called automatically whenever your network needs updated real world knowledge.
+Remember that it works (just like <code>ReceiveNetworkOutputs()</code>) with a vector of doubles, so most of the time you'll want to translate your
+inputs by dividing them by their maximally possible values.</p>
 
 <blockquote>
 <p>default minNeuralCharge = 0.0;<br>
@@ -134,7 +161,13 @@ default maxNeuralCharge = 1.0;<br>
 It is <strong>highly</strong> recommended to leave these values like this (see advanced FAQ for details)</p>
 </blockquote>
 
-<p><strong>Example</strong>: TODO</p>
+<p><strong>Example</strong>: Let's assume you want to create a handwriting reader.
+Your input would be a 20 pixels wide and 20 pixels high image of a hand drawn letter.
+In order to feed the neural network with this information,
+we'll create a vector with 20 * 20 = 400 inputs, each one having a value between 0.0 and 1.0 that represents this pixels blackness.
+We can do this in a variety of ways. One of them would be to add the RGB values of the pixel up and divide them by
+the maximum possible, 255+255+255 = 765. By this method, a bright red pixel(255,0,0) would be represented in our 400 element vector by
+the number 255 / 765 = 0.3333.</p>
 
 <h3>
 <a id="full-example" class="anchor" href="#full-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Full Example</h3>
