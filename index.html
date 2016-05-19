@@ -42,7 +42,8 @@ of Augmenting Topologies, <a href="http://nn.cs.utexas.edu/downloads/papers/stan
 <ul>
 <li>Speed - through modern and efficient C++14</li>
 <li>Clean Code - through constant ongoing refactoring and a deep care for aesthetics</li>
-<li>Usability - through beeing able to be used without much knowledge of Neural Networks</li>
+<li>Usability - through being able to be used without much knowledge of Neural Networks</li>
+<li>Platform Independency - written on three different operating systems (Windows, Ubuntu, MacOS X) and two different IDEs (Visual Studio 2015, CLion), it is safe to say, that it will work on multiple platforms, flawlessly.</li>
 </ul>
 
 <h2>
@@ -63,9 +64,10 @@ That's the age old principle of encapsulation!</p>
 <p>Another problem we've encountered, was platform dependency. Despite being conceived as a platform independent language,
 we encountered various implementations of NEAT, that managed to break this. Examples included code with for loops looking like this:</p>
 
-<div class="highlight highlight-source-shell"><pre><span class="pl-k">for</span>( i = 0<span class="pl-k">;</span> i <span class="pl-k">&lt;</span> 10<span class="pl-k">;</span> i++ ){
+<pre><code>for( i = 0; i &lt; 10; i++ ){  
     ...
-}</pre></div>
+}
+</code></pre>
 
 <p>Notice the <code>i</code> not having been declared? Some compilers permit this. Another, more subtle one was the <code>abstract</code> keyword
 of Microsoft Visual Studio. It's actually not part of the language. The official way is to write an (admittedly more arbitrary) <code>= 0</code>
@@ -74,55 +76,77 @@ at the end of a function.</p>
 <h3>
 <a id="what-is-neat" class="anchor" href="#what-is-neat" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is NEAT?</h3>
 
-<p>TODO</p>
+<p>N/A</p>
 
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
 
-<p>First, you have to instantiate a <code>NeuralNetworkTrainer</code>. This class will take care of everything. It uses standard training values if not provided with a parameter.
-If you know what you're doing, you can provide it with a <code>NeuralNetworkTrainer::RuleSet</code> instance to tweak the learning process.</p>
-
-<p>You then have to provide an implementation of the <code>ITrainable</code> interface. It's methods are</p>
+<p>You first have to provide an implementation of the <code>IBody</code> interface. You need to provide a copy constructor as well as following methods:   </p>
 
 <ul>
-<li>Update()</li>
-<li>GetOrCalculateFitness()</li>
-<li>ReceiveNetworkOutputs()</li>
-<li>ProvideNetworkWithInputs()</li>
+<li>Update()<br>
+</li>
+<li>GetFitness()<br>
+</li>
+<li>Reset<br>
+</li>
+<li>ProvideNetworkWithInputs()<br>
+</li>
 </ul>
+
+<p>They are all explained in detail below.<br>
+<details>
+<summary>Example</summary>
+N/A
+</details></p>
+
+<p>You need to instantiate a <code>NeuralNetworkTrainer::TrainingParameters</code> object. You <strong>have</strong> to set its <code>numberOfInputs</code>, <code>numberOfOutputs</code>, <code>updatesPerGeneration</code> members.<br>
+If you know what you're doing, you can change the members in the <code>advanced</code> structure to tweak the learning process.  </p>
+
+<p><details>
+<summary>Example</summary></details></p>
+
+<pre><code>TrainingParameters params;
+params.numberOfInputs = 2;
+params.numberOfOutputs = 1;
+params.updatesPerGeneration = 4;
+</code></pre>
+
+<p></p>
+
+<p>Then, you'll want to create a <code>NeuralNetworkTrainer</code> instance with our <code>TrainingParameters</code>.
+<details>
+<summary>Example</summary>
+N/A
+</details></p>
+
+<h2>
+<a id="explanation-of-ibody" class="anchor" href="#explanation-of-ibody" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Explanation of IBody</h2>
 
 <h3>
 <a id="update" class="anchor" href="#update" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update()</h3>
 
 <p>This method gets called automatically multiple times during training.</p>
 
-<blockquote>
-<p>default updatesPerGeneration: 1
-Imagine this value as <strong>number of actions per lifetime</strong></p>
-</blockquote>
-
-<p>The actions of your object should take place here. This almost always boils down to <strong>executing the command the Neural Network decides to use</strong>. (Remember: You get this Information by calling <code>LoadNeuralNetworkOutputs()</code>).</p>
-
-<p><strong>Example</strong>: Say you want to train an artificial player for Super Mario World. This method should then take care of actually pressing the buttons your network want you to. In this specific case, it should also update the whole game for a frame, so enemies and items can react to Mario.</p>
+<p>The actions of your object should take place here. This almost always boils down to <strong>executing the command the Neural Network decides to use</strong>. This information is delivered to you by the parameter <code>const std::vector&lt;float&gt;&amp; networkOutputs</code>.
+<details>
+<summary>Example</summary>
+Say you want to train an artificial player for Super Mario World. This method should then take care of actually pressing the buttons your network want you to. In this specific case, it should also update the whole game for a frame, so enemies and items can react to Mario. A possible interpretention of the <code>networkOutputs</code> would be to say that every float in the vector is a button and should be pressed if it's value is above <code>0.5</code>.
+</details></p>
 
 <h3>
-<a id="getorcalculatefitness" class="anchor" href="#getorcalculatefitness" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GetOrCalculateFitness()</h3>
+<a id="getfitness" class="anchor" href="#getfitness" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>GetFitness()</h3>
 
 <p>This method tells the trainer how good this specific instance is compared to others.
-It gets called automatically when the <code>ITrainable</code> object dies</p>
+It gets called automatically when the <code>INetworkTrainer</code> object dies
+It's used to generate this objects offspring, with a fitness score of zero or lower meaning that this individuals genes are not going to get passed on</p>
 
-<blockquote>
-<p>It's used to generate this objects offspring, with a fitness score of zero or lower meaning that this individuals genes are not going to get passed on</p>
+<p>Note that in very analog programs such as real world simulations, true perfection should be unreachable
+<details>
+<summary>Example</summary>
+A simulated chess player could have a fitness method implemented like this:</details></p>
 
-<p>default minFitness: -2147483646
-default maxFitness: 100</p>
-</blockquote>
-
-<p>Note that in very analog programs such as real world simulations, true perfection should be unreachable</p>
-
-<p><strong>Example</strong>: A simulated chess player could have a fitness method implemented like this:</p>
-
-<div class="highlight highlight-source-shell"><pre>unsigned int <span class="pl-en">ChessSim::GetOrCalculateFitness</span>() {
+<div class="highlight highlight-source-shell"><pre>int <span class="pl-en">ChessSim::GetFitness</span>() const {
   unsigned int fitness = 0<span class="pl-k">;</span>
   <span class="pl-k">for</span> (const auto <span class="pl-k">&amp;</span> piece <span class="pl-c1">:</span> enemyKilledPieces) {
     fitness += <span class="pl-en">piece.GetImportance</span>();
@@ -133,56 +157,52 @@ default maxFitness: 100</p>
   <span class="pl-k">return</span> fitness<span class="pl-k">;</span>
 }</pre></div>
 
+<p>or, if you store a member <code>fitness</code> that you change in the Update() function.  </p>
+
+<div class="highlight highlight-source-shell"><pre>int <span class="pl-en">ChessSim::GetFitness</span>() const {
+    <span class="pl-k">return</span> fitness
+}</pre></div>
+
+<p></p>
+
 <h3>
-<a id="receivenetworkoutputs" class="anchor" href="#receivenetworkoutputs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ReceiveNetworkOutputs()</h3>
+<a id="reset" class="anchor" href="#reset" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reset()</h3>
 
-<p>This method returns the conclusions of your neural network as a series of floats</p>
+<p>This method gets called after your training object has finished its lifecicle and starts to train again with different neural configurations. It should reset the training object to the state it had before training.  </p>
 
-<blockquote>
-<p>default minNeuralCharge = 0.0;
-default maxNeuralCharge = 1.0;
-It is <strong>highly</strong> recommended to leave these values like this (see advanced FAQ for details)</p>
-</blockquote>
+<p>If you decide to use a member to store the <code>fitness</code>, it should be set to zero in here.</p>
 
-<p>Almost always you'll want to translate these values into something your program can work with and store in a member</p>
-
-<p><strong>Example</strong>: TODO</p>
+<p><details>
+<summary>Example</summary>
+ If you are programming a Super Mario World player, the code to restart the level should be in here
+</details></p>
 
 <h3>
 <a id="providenetworkwithinputs" class="anchor" href="#providenetworkwithinputs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>ProvideNetworkWithInputs()</h3>
 
 <p>This method describes what your network "sees". It get's called automatically whenever your network needs updated real world knowledge.
-Remember that it works (just like <code>ReceiveNetworkOutputs()</code>) with a vector of doubles, so most of the time you'll want to translate your
-inputs by dividing them by their maximally possible values.</p>
-
-<blockquote>
-<p>default minNeuralCharge = 0.0;<br>
-default maxNeuralCharge = 1.0;<br>
-It is <strong>highly</strong> recommended to leave these values like this (see advanced FAQ for details)</p>
-</blockquote>
-
-<p><strong>Example</strong>: Let's assume you want to create a handwriting reader.
+Remember that it works with a vector of floats, so most of the time you'll want to translate your
+inputs by dividing them by their maximally possible values.
+<details>
+<summary>Example</summary>
+Let's assume you want to create a handwriting reader.
 Your input would be a 20 pixels wide and 20 pixels high image of a hand drawn letter.
 In order to feed the neural network with this information,
 we'll create a vector with 20 * 20 = 400 inputs, each one having a value between 0.0 and 1.0 that represents this pixels blackness.
 We can do this in a variety of ways. One of them would be to add the RGB values of the pixel up and divide them by
 the maximum possible, 255+255+255 = 765. By this method, a bright red pixel(255,0,0) would be represented in our 400 element vector by
-the number 255 / 765 = 0.3333.</p>
-
-<h3>
-<a id="full-example" class="anchor" href="#full-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Full Example</h3>
-
-<p>TODO</p>
+the number 255 / 765 = 0.3333.
+ </details></p>
 
 <h2>
 <a id="faq" class="anchor" href="#faq" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>FAQ</h2>
 
-<p>TODO</p>
+<p>N/A</p>
 
 <h2>
-<a id="advanced-faq" class="anchor" href="#advanced-faq" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Advanced FAQ</h2>
+<a id="design-decisions" class="anchor" href="#design-decisions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Design decisions</h2>
 
-<p>TODO</p>
+<p>N/A</p>
       </section>
     </div>
 
