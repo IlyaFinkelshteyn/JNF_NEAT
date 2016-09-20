@@ -1,5 +1,10 @@
+install:
+  - ps: choco install make
+
 build_script:
-  - msbuild %solution_name%
+  - cmake -DCMAKE_CXX_COMPILER=g++-6 CMakeLists.txt
+  - make 
+  - make test
 
 on_finish:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
